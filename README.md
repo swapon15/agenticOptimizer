@@ -1,3 +1,8 @@
+
+<img width="816" height="689" alt="Screenshot 2026-10-24 at 10 49 10 AM" src="https://github.com/user-attachments/assets/44acd3c1-3e9f-41d8-9a91-c4cf67af849d" />
+
+
+
 # Building a Reusable Engineering Optimization Agent
 
 **An incremental engineering project exploring genetic algorithms, MATLAB optimization, MCP-based integration, and AI agent orchestration.**
