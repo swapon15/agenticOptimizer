@@ -3,9 +3,7 @@ import numpy as np
 
 
 # Target geometric proportions.
-# These are initial design assumptions and can be tuned
-# after inspecting generated faces.
-
+# Vertical positions are measured relative to the top of the face.
 TARGETS = {
     "eye_y_ratio": 0.38,
     "nose_length_ratio": 0.18,
@@ -25,7 +23,6 @@ WEIGHTS = {
 def face_fitness(x):
     """
     Calculate a scalar geometric fitness score.
-
     Lower score is better.
 
     Chromosome:
@@ -55,22 +52,24 @@ def face_fitness(x):
     if face_width <= 0 or face_height <= 0:
         return 1e6
 
-    # Normalize vertical measurements by face height.
-    eye_y_ratio = eye_y / face_height
-    nose_length_ratio = nose_length / face_height
-    mouth_y_ratio = mouth_y / face_height
+    # The face ellipse is centered at y = 0.5.
+    face_top = 0.5 - face_height / 2
 
-    # Normalize horizontal measurements by face width.
+    # Normalize vertical positions relative to the face top.
+    eye_y_ratio = (eye_y - face_top) / face_height
+    mouth_y_ratio = (mouth_y - face_top) / face_height
+
+    # Normalize dimensions by the corresponding face dimension.
+    nose_length_ratio = nose_length / face_height
     nose_width_ratio = nose_width / face_width
     mouth_width_ratio = mouth_width / face_width
 
-    # Symmetry: both sides are generated symmetrically
-    # around the face center in the current renderer.
+    # The current renderer creates symmetric facial features.
     symmetry_score = 0.0
 
     # Eye placement.
-    eye_score = (
-        abs(eye_y_ratio - TARGETS["eye_y_ratio"])
+    eye_score = abs(
+        eye_y_ratio - TARGETS["eye_y_ratio"]
     )
 
     # Nose proportions.
@@ -88,19 +87,15 @@ def face_fitness(x):
     # Geometric validity penalties.
     validity_penalty = 0.0
 
-    # Eyes should remain inside the face.
     if eye_spacing / 2 + eye_size / 2 >= face_width / 2:
         validity_penalty += 10.0
 
-    # Mouth should remain inside the face.
     if mouth_width >= face_width:
         validity_penalty += 10.0
 
-    # Mouth should be below the eyes.
     if mouth_y <= eye_y:
         validity_penalty += 10.0
 
-    # Nose should have positive dimensions.
     if nose_length <= 0 or nose_width <= 0:
         validity_penalty += 10.0
 
